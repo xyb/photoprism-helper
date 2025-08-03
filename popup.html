@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhotoPrism Helper</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            width: 300px;
+            padding: 10px;
+            font-size: 14px;
+        }
+        h1 {
+            font-size: 16px;
+            margin-top: 0;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        #label-input {
+            width: 95%;
+            padding: 5px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .button-group button {
+            width: 48%;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #add-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        #remove-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        #progress-container {
+            display: none; /* Hidden by default */
+            margin-bottom: 10px;
+        }
+        #progress-bar-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            height: 20px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #007bff;
+            transition: width 0.2s;
+        }
+        #progress-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        #status {
+            text-align: center;
+            font-size: 12px;
+            min-height: 15px;
+        }
+        #clear-cache {
+            font-size: 10px;
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline;
+            float: right;
+        }
+        .recent-labels {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        .recent-label-tag {
+            display: inline-block;
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            margin: 2px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .recent-label-tag:hover {
+            background-color: #e0e0e0;
+        }
+        
+        /* Debug panel styles */
+        #debug-container {
+            margin-top: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        
+        #debug-panel {
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 10px;
+            font-family: monospace;
+            background-color: #f8f9fa;
+        }
+        
+        #debug-messages {
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .debug-log {
+            color: #333;
+        }
+        
+        .debug-info {
+            color: #007bff;
+        }
+        
+        .debug-warn {
+            color: #ffc107;
+        }
+        
+        .debug-error {
+            color: #dc3545;
+        }
+        
+        .debug-debug {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <h1>PhotoPrism Helper</h1>
+    <div class="form-group">
+        <label for="label-input" style="display: block; margin-bottom: 5px; font-size: 12px; font-weight: bold;">Label Name:</label>
+        <input type="text" id="label-input" placeholder="Enter label name..." list="label-list">
+        <datalist id="label-list"></datalist>
+    </div>
+    <div class="recent-labels" id="recent-labels">
+        Recent: <span id="no-recent">None</span>
+    </div>
+    <div class="button-group">
+        <button id="add-btn">Add</button>
+        <button id="remove-btn">Remove</button>
+    </div>
+    <div id="progress-container">
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="progress-text">0 / 0</div>
+    </div>
+    <div id="status">Enter a label and select an action.</div>
+    <div class="execution-history" id="execution-history" style="margin-top: 10px; font-size: 12px; color: #666;">
+        Recent Executions: <span id="no-history">None</span>
+    </div>
+    <div class="failed-operations" id="failed-operations" style="margin-top: 10px; font-size: 12px; color: #666;">
+        Failed Operations: <span id="no-failed">None</span>
+    </div>
+    <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 10px;">
+        <button id="config-btn" style="font-size: 10px; padding: 2px 6px; background: none; border: 1px solid #007bff; color: #007bff; border-radius: 3px; cursor: pointer;">⚙️ Settings</button>
+    </div>
+    
+    <!-- Debug Info Area -->
+    <div id="debug-container" style="margin-top: 10px; border-top: 1px solid #ccc; padding-top: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+            <span style="font-size: 12px; font-weight: bold; color: #666;">Debug Info:</span>
+            <button id="debug-toggle" style="font-size: 10px; padding: 2px 6px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">Toggle</button>
+            <button id="debug-clear" style="font-size: 10px; padding: 2px 6px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Clear</button>
+        </div>
+        <div id="debug-panel" style="display: none; max-height: 150px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 5px; font-size: 10px; font-family: monospace; background-color: #f8f9fa;">
+            <div id="debug-messages" style="white-space: pre-wrap; word-break: break-all;"></div>
+        </div>
+    </div>
+
+    <script src="storage-utils.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoPrism Helper - Configuration</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section h2 {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .domain-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
+        }
+        .domain-url {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+            flex: 1;
+            word-break: break-all;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+        .domain-input-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .domain-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .add-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+        }
+        .examples {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .domain-validation {
+            font-size: 12px;
+            color: #dc3545;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PhotoPrism Helper Configuration</h1>
+        
+        <div class="section">
+            <h2>Add PhotoPrism Instance</h2>
+            
+            <div class="domain-input-group">
+                <input type="text" id="new-domain" class="domain-input" placeholder="https://demo.photoprism.app" pattern="https?://.*">
+                <button class="add-btn" id="add-domain-btn">Add Instance</button>
+            </div>
+            
+            <div class="examples">
+                <strong>Examples:</strong> https://demo.photoprism.app, https://photos.example.com, http://192.168.1.100:2342
+            </div>
+            
+            <div class="domain-validation" id="domain-validation"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Configured Instances</h2>
+            
+            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                These are the PhotoPrism instances where the extension will be active. 
+                The extension will work on any page within these domains.
+            </p>
+            
+            <div id="domain-list">
+                <div class="empty-state" id="empty-domains">
+                    No instances configured. Add one above to get started.
+                </div>
+            </div>
+        </div>
+        
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div class="section">
+            <h2>Advanced Settings</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <input type="checkbox" id="debug-enabled" style="margin-right: 8px;">
+                    <span style="font-size: 14px;">Enable debug mode</span>
+                </label>
+                <p style="font-size: 12px; color: #666; margin-left: 20px; margin-top: 0;">
+                    When enabled, debug information will be shown on the extension popup
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Cache Management</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div>
+                    <button id="clear-label-cache-btn" style="width: 100%; padding: 8px 16px; background-color: #fd7e14; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 5px;">
+                        Clear Label Cache
+                    </button>
+                    <p style="font-size: 11px; color: #666; margin-top: 2px;">
+                        Clear cached label IDs
+                    </p>
+                </div>
+                
+                <div>
+                    <button id="clear-recent-labels-btn" style="width: 100%; padding: 8px 16px; background-color: #6f42c1; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 5px;">
+                        Clear Recent Labels
+                    </button>
+                    <p style="font-size: 11px; color: #666; margin-top: 2px;">
+                        Clear recently used labels
+                    </p>
+                </div>
+                
+                <div>
+                    <button id="clear-history-btn" style="width: 100%; padding: 8px 16px; background-color: #20c997; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 5px;">
+                        Clear History
+                    </button>
+                    <p style="font-size: 11px; color: #666; margin-top: 2px;">
+                        Clear execution history
+                    </p>
+                </div>
+                
+                <div>
+                    <button id="clear-failed-btn" style="width: 100%; padding: 8px 16px; background-color: #e83e8c; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 5px;">
+                        Clear Failed Operations
+                    </button>
+                    <p style="font-size: 11px; color: #666; margin-top: 2px;">
+                        Clear failed operation records
+                    </p>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <button id="clear-cache-btn" style="padding: 8px 16px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                    Clear All Cache
+                </button>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Clear all cached data including labels, history, and failed operations
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+</body>
+</html>
